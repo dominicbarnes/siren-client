@@ -1,0 +1,21 @@
+{
+  "name": "siren-client",
+  "version": "0.0.0",
+  "description": "A simple client for siren APIs",
+  "main": "index.js",
+  "repository": "dominicbarnes/siren-client",
+  "author": "Dominic Barnes <dominic@dbarnes.info>",
+  "license": "MIT",
+  "devDependencies": {
+    "@dominicbarnes/eslint-config": "*",
+    "@dominicbarnes/eslint-config-browser": "*",
+    "@dominicbarnes/eslint-config-test": "*",
+    "duo-tester": "^0.1.1",
+    "eslint": "^1.1.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test": "duo-tester phantomjs",
+    "start": "duo-tester browser"
+  }
+}
