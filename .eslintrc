@@ -1,6 +1,3 @@
 {
-  "extends": "@dominicbarnes/browser",
-  "env": {
-    "node": true
-  }
+  "extends": "@dominicbarnes/browser"
 }
