@@ -11,7 +11,9 @@ describe('Entity(data)', function () {
       entities: [],
       links: [],
       actions: [],
-      title: ''
+      title: '',
+      href: '',
+      rel: []
     });
   });
 
@@ -22,7 +24,9 @@ describe('Entity(data)', function () {
       entities: [ 'c' ],
       links: [ 'd' ],
       actions: [ 'e' ],
-      title: 'f'
+      title: 'f',
+      href: 'g',
+      rel: [ 'h' ]
     });
 
     assert.deepEqual(e.data, {
@@ -31,7 +35,9 @@ describe('Entity(data)', function () {
       entities: [ 'c' ],
       links: [ 'd' ],
       actions: [ 'e' ],
-      title: 'f'
+      title: 'f',
+      href: 'g',
+      rel: [ 'h' ]
     });
   });
 
@@ -98,7 +104,7 @@ describe('Entity(data)', function () {
   describe('#title', function () {
     var title = 'a';
 
-    it('should retrieve the array', function () {
+    it('should retrieve the string', function () {
       var e = new Entity({ title: title });
       assert.strictEqual(e.title, title);
     });
@@ -120,6 +126,29 @@ describe('Entity(data)', function () {
         assert(entity instanceof Entity);
         assert.strictEqual(entity.title, arr[x].title);
       });
+    });
+  });
+
+  describe('#href', function () {
+    var href = 'a';
+
+    it('should retrieve the string', function () {
+      var e = new Entity({ href: href });
+      assert.strictEqual(e.href, href);
+    });
+  });
+
+  describe('#rel', function () {
+    var arr = [ 'a', 'b' ];
+
+    it('should retrieve the array', function () {
+      var e = new Entity({ rel: arr });
+      assert.deepEqual(e.rel, arr);
+    });
+
+    it('should clone inputs', function () {
+      var e = new Entity({ rel: arr });
+      assert.notStrictEqual(e.rel, arr);
     });
   });
 });
