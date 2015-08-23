@@ -1,4 +1,9 @@
 
+0.0.5 / 2015-08-23
+==================
+
+  * allowing entities to be serialized and deserialized externally
+
 0.0.4 / 2015-08-10
 ==================
 
