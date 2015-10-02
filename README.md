@@ -1,19 +1,18 @@
 # siren-client
 
-> A specialized siren API client.
+> A specialized [siren](https://github.com/kevinswiber/siren) API client.
 
 ## Usage
 
 This particular client is built in a very specialized fashion. It operates
-by only working with a single entity at a time.
+by only working with a single entity at a time, more or less as a _stream_.
 
-This makes it more suitable for use in applications that are going to make
-use entirely of a hypermedia-driven interface. (rather than as an ad-hoc
-client for a siren API)
+This makes it more suitable for use in applications that are going to make use
+entirely of a hypermedia-driven interface. (rather than as an ad-hoc client)
 
-As such, it does _not_ work with callbacks. Instead, the client instance is
-an emitter that emits events when a new entity is fetched. (or when an action
-is complete)
+As such, it does *not* work with callbacks. Instead, the client instance is an
+emitter that emits events when a new entity is fetched. (or when an action is
+successfully complete)
 
 ```js
 var Siren = require('siren-client');
@@ -25,98 +24,138 @@ client.on('error', function (err) {
 });
 
 client.on('entity', function (entity) {
-  // this object is a wrapped instance of the data returned by the server,
-  // giving it helpers for traversing the links/actions/etc of the entity
+  // an `Entity` instance, see docs below
   console.log(entity);
 });
 
-// starts the client at the given url, from there you can call this method
-// as you navigate through the api
-client.get('http://localhost/api');
+// retrieves the given url as the entry point for the api you are working with.
+client.get('http://siren.example.com/');
 ```
 
 ## API
 
-### Client() *(constructor)*
+### Client(href) *(constructor)*
 
-Creates a new client instance, this is just a simple `Emitter` right now.
+Creates a new client instance, if `href` is passed, it will use that as the
+entry point and starts navigating. (make sure to attach to the `entity` and
+`error` events)
 
 ### Client#get(url)
 
-Retrieves the resource at the given `url` and processes it as a siren entity.
-It does not accept a callback, you currently need to subscribe to the `entity`
-event in order to process this navigation.
+This is how you set the entry point for the API you are interacting with. It
+will fetch the given URL and use that as the first/new entity.
 
-### Client#action(url, method, data)
+### Client#submit(action, data)
 
-Issues the given `action` against the API.
+Submits the `action` with accompanying `data` to the API.
 
-**NOTE:** This is very low-level at the moment, and does not offer much sugar
-when working with the siren object. (this will likely be made simpler in future
-iterations)
+The `action` param is the action object given by a siren API.
 
-**NOTE:** This does not currently support alternate `enctype` options, it only
-supports JSON at the time. (this will be added in future iterations)
-
-### Client: `error(err)` *(event)*
-
-Fired for errors that happen trying to send/receive data. The raw `err` is passed
-so you can respond accordingly.
-
-Currently, when an error like this happens, it is likely your application will
-simply try again, but that will be up to your code to handle.
-
-**NOTE:** These are **not** application errors. These will likely be HTTP failures,
-rejected cross-origin requests, etc.
+The `data` param is an object of key-value pairs that should be serialized and
+sent as the body. The easiest way to accomplish this is to use a well-formed
+HTML `<form>` along with something like [form-serialize](https://github.com/dominicbarnes/form-serialize)
+to generate the object.
 
 ### Client: `entity(entity)` *(event)*
 
-Fired after an entity has been loaded. (also after an `action` has been processed
-successfully) The passed `entity` is an instance of `Entity`. (API documented below)
+Fired after an entity has been loaded. (also after an `action` has been
+processed successfully) The passed `entity` is an instance of `Entity`. (API
+documented below)
+
+### Client: `error(err)` *(event)*
+
+Fired for errors that happen trying to send/receive data. The raw `err` is
+passed so you can respond accordingly.
+
+**NOTE:** These are **not** application errors. These will likely be HTTP
+failures, rejected cross-origin requests, etc.
+
 
 ### Entity(data) *(constructor)*
 
-Wrapper for siren entity objects. It offers some limited sugar for interacting
-with the entity data. In the future, this will likely become it's own module as
-it's API is fleshed out more.
+Wrapper for siren entity objects, which offers convenient APIs for finding
+links/entities/actions within the larger entity.
 
-This is the wrapper that is passed to the `entity` event.
+### Entity#title()
 
-### Entity#actions *(getter)*
+Retrieves the `title` attribute for the entity. If not defined, it will return
+an empty string.
 
-Retrieves a copy of the `actions` array. Currently, it only returns raw objects, but
-this will likely be converted to some sort of `Actions` object in the future.
+### Entity#properties()
 
-If none were defined, it will simply return an empty array.
+Retrieves a copy of the `properties` object. If none were defined, it will
+simply return an empty object.
 
-### Entity#class *(getter)*
+### Entity#class()
 
-Retrieves a copy of the `class` array.
+Retrieves a copy of the `class` array. This always returns an `Array`, even
+if that means it is empty.
 
-If none were defined, it will simply return an empty array.
+### Entity#entity([search])
 
-### Entity#links *(getter)*
+Retrieves the first entity (wrapped as an `Entity` instance) that matches the
+optional `search` criteria. The `search` parameter can be specified as:
 
-Retrieves a copy of the `entities` array. This converts the raw objects into an array
-of `Entity` instances.
+- a `String` used to search for entity with a matching `rel`
+- an `Object` with either a `rel` or `class` key to match against
+- a `Function` that should return `true` for the correct entity
 
-If none were defined, it will simply return an empty array.
+If none is found, this will return `null`.
 
-### Entity#links *(getter)*
+### Entity#entities([search])
 
-Retrieves a copy of the `links` array. Currently, it only returns raw objects, but
-this will likely be converted to some sort of `Links` object in the future.
+Retrieves an `Array` of entities (wrapped as `Entity` instances) that match
+the optional `search` criteria. The `search` parameter can be specified as:
 
-If none were defined, it will simply return an empty array.
+- a `String` used to search for entity with a matching `rel`
+- an `Object` with either a `rel` or `class` key to match against
+- a `Function` that should return `true` for the correct entity
 
-### Entity#properties *(getter)*
+This will return an `Array`, containing all the matching actions. (even if that
+means it is empty)
 
-Retrieves a copy of the `properties` object.
+### Entity#link([search])
 
-If none were defined, it will simply return an empty object.
+Retrieves the first link that matches the optional `search` criteria. The
+`search` parameter can be specified as:
 
-### Entity#title *(getter)*
+- a `String` used to search for link with a matching `rel`
+- an `Object` with either a `rel` or `class` key to match against
+- a `Function` that should return `true` for the correct link
 
-Retrieves the `title` attribute for the entity.
+If none is found, this will return `null`.
 
-If not defined, it will return an empty string.
+### Entity#links([search])
+
+Retrieves an `Array` of links that match the optional `search` criteria. The
+`search` parameter can be specified as:
+
+- a `String` used to search for link with a matching `rel`
+- an `Object` with either a `rel` or `class` key to match against
+- a `Function` that should return `true` for the correct link
+
+This will return an `Array`, containing all the matching links. (even if that
+means it is empty)
+
+### Entity#action([search])
+
+Retrieves the first action that matches the optional `search` criteria. The
+`search` parameter can be specified as:
+
+- a `String` used to search for action with a matching `name`
+- an `Object` with either a `name` or `class` key to match against
+- a `Function` that should return `true` for the correct action
+
+If none is found, this will return `null`.
+
+### Entity#actions([search])
+
+Retrieves an `Array` of actions that match the optional `search` criteria. The
+`search` parameter can be specified as:
+
+ - a `String` used to search for action with the same `name`
+ - an `Object` with either a `name` or `class` key to match against
+ - a `Function` that should return `true` for the correct action
+
+This will return an `Array`, containing all the matching actions. (even if that
+means it is empty)
