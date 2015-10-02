@@ -45,11 +45,18 @@ entry point and starts navigating. (make sure to attach to the `entity` and
 This is how you set the entry point for the API you are interacting with. It
 will fetch the given URL and use that as the first/new entity.
 
+### Client#follow(link)
+
+This follows the given `link` and uses the response as the next entity.
+
+The `link` param can either be a `String` url, or a link `Object` given by a
+siren API.
+
 ### Client#submit(action, data)
 
 Submits the `action` with accompanying `data` to the API.
 
-The `action` param is the action object given by a siren API.
+The `action` param is the action `Object` given by a siren API.
 
 The `data` param is an object of key-value pairs that should be serialized and
 sent as the body. The easiest way to accomplish this is to use a well-formed
