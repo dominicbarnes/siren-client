@@ -144,8 +144,8 @@ describe('Entity(data)', function () {
 
       context('as a function', function () {
         it('should return the first entity that pass the truth test', function () {
-          var actual = e.entity(function (entity, x) {
-            return (x + 1) % 2 === 0; // even numbers only!
+          var actual = e.entity(function (entity) {
+            return entity.title === 'B';
           }).toObject();
 
           var expected = arr[1];
@@ -153,6 +153,28 @@ describe('Entity(data)', function () {
           assert.deepEqual(actual, expected);
         });
       });
+    });
+  });
+
+  describe('#withEntity(search, fn)', function () {
+    var arr = [
+      { title: 'A', rel: [ 'a' ] },
+      { title: 'B', rel: [ 'b' ] }
+    ];
+
+    var e = new Entity({ entities: arr });
+
+    it('should return null when no entity matches', function () {
+      assert.strictEqual(e.withEntity('does-not-exist'), null);
+    });
+
+    it('should run the given fn on the matched entity', function () {
+      var result = e.withEntity('b', function (entity) {
+        assert.deepEqual(entity.toObject(), arr[1]);
+        return 'test';
+      });
+
+      assert.strictEqual(result, 'test');
     });
   });
 
@@ -300,15 +322,15 @@ describe('Entity(data)', function () {
 
       context('as a function', function () {
         it('should return all entities that pass the truth test', function () {
-          var list = e.entities(function (entity, x) {
-            return (x + 1) % 2 === 0; // even numbers only!
+          var list = e.entities(function (entity) {
+            return entity.title === 'B';
           });
 
           var actual = list.map(function (entity) {
             return entity.toObject();
           });
 
-          var expected = [ arr[1], arr[3] ];
+          var expected = [ arr[1] ];
 
           assert.deepEqual(actual, expected);
         });
@@ -396,13 +418,35 @@ describe('Entity(data)', function () {
 
       context('as a function', function () {
         it('should return the first link that pass the truth test', function () {
-          var actual = e.link(function (link, x) {
-            return (x + 1) % 2 === 0; // even numbers only!
+          var actual = e.link(function (link) {
+            return link.href === '/2';
           });
 
           assert.deepEqual(actual, arr[1]);
         });
       });
+    });
+  });
+
+  describe('#withLink(search, fn)', function () {
+    var arr = [
+      { title: 'A', rel: [ 'a' ] },
+      { title: 'B', rel: [ 'b' ] }
+    ];
+
+    var e = new Entity({ links: arr });
+
+    it('should return null when no entity matches', function () {
+      assert.strictEqual(e.withLink('does-not-exist'), null);
+    });
+
+    it('should run the given fn on the matched entity', function () {
+      var result = e.withLink('b', function (link) {
+        assert.deepEqual(link, arr[1]);
+        return 'test';
+      });
+
+      assert.strictEqual(result, 'test');
     });
   });
 
@@ -503,11 +547,11 @@ describe('Entity(data)', function () {
 
       context('as a function', function () {
         it('should return all links that pass the truth test', function () {
-          var list = e.links(function (link, x) {
-            return (x + 1) % 2 === 0; // even numbers only!
+          var list = e.links(function (link) {
+            return link.title === 'B';
           });
 
-          assert.deepEqual(list, [ arr[1], arr[3] ]);
+          assert.deepEqual(list, [ arr[1] ]);
         });
       });
     });
@@ -583,13 +627,35 @@ describe('Entity(data)', function () {
 
       context('as a function', function () {
         it('should return the first action that pass the truth test', function () {
-          var actual = e.action(function (action, x) {
-            return (x + 1) % 2 === 0; // even numbers only!
+          var actual = e.action(function (action) {
+            return action.href === '/2';
           });
 
           assert.deepEqual(actual, arr[1]);
         });
       });
+    });
+  });
+
+  describe('#withAction(search, fn)', function () {
+    var arr = [
+      { title: 'A', name: 'a' },
+      { title: 'B', name: 'b' }
+    ];
+
+    var e = new Entity({ actions: arr });
+
+    it('should return null when no entity matches', function () {
+      assert.strictEqual(e.withAction('does-not-exist'), null);
+    });
+
+    it('should run the given fn on the matched entity', function () {
+      var result = e.withAction('b', function (action) {
+        assert.deepEqual(action, arr[1]);
+        return 'test';
+      });
+
+      assert.strictEqual(result, 'test');
     });
   });
 
@@ -678,13 +744,64 @@ describe('Entity(data)', function () {
 
       context('as a function', function () {
         it('should return all actions that pass the truth test', function () {
-          var list = e.actions(function (action, x) {
-            return (x + 1) % 2 === 0; // even numbers only!
+          var list = e.actions(function (action) {
+            return action.title === 'B';
           });
 
-          assert.deepEqual(list, [ arr[1], arr[3] ]);
+          assert.deepEqual(list, [ arr[1] ]);
         });
       });
+    });
+  });
+
+  describe('#field(action, name)', function () {
+    var action = {
+      name: 'a',
+      fields: [
+        { name: 'A', value: 1 },
+        { name: 'B', value: 2 },
+        { name: 'C', value: 3 }
+      ]
+    };
+
+    var e = new Entity({ actions: [ action ] });
+
+    it('should return empty when no action', function () {
+      assert(!e.field(null));
+    });
+
+    it('should return empty when not present', function () {
+      assert(!e.field(action, 'does-not-exist'));
+    });
+
+    it('should return the field with the same name', function () {
+      assert.deepEqual(e.field(action, 'B'), action.fields[1]);
+    });
+  });
+
+  describe('#withField(action, name, fn)', function () {
+    var action = {
+      name: 'a',
+      fields: [
+        { name: 'A', value: 1 },
+        { name: 'B', value: 2 },
+        { name: 'C', value: 3 }
+      ]
+    };
+
+    var e = new Entity({ actions: [ action ] });
+
+    it('should return null when no entity matches', function () {
+      assert.strictEqual(e.withField(action, 'does-not-exist'), null);
+    });
+
+    it('should run the given fn on the matched entity', function () {
+      var result = e.withField(action, 'B', function (field) {
+        assert.deepEqual(field, action.fields[1]);
+        return 'test';
+      });
+
+      assert.strictEqual(result, 'test');
     });
   });
 
