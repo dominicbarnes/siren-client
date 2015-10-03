@@ -1,4 +1,9 @@
 
+0.2.0 / 2015-10-02
+==================
+
+  * adding 'with*' helpers for making conditional rendering easier
+
 0.1.1 / 2015-10-02
 ==================
 
