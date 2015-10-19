@@ -23,7 +23,7 @@ describe('Client()', function () {
     assert(Client.prototype.on, 'should have an on method');
   });
 
-  describe('#get(href)', function () {
+  describe('#get(href, [callback])', function () {
     var xhr;
     var requests = [];
     var client = new Client();
@@ -92,9 +92,14 @@ describe('Client()', function () {
       client.get('/4');
       respond(requests.pop(), data);
     });
+
+    it('should fire the callback', function (done) {
+      client.get('/4', done);
+      respond(requests.pop());
+    });
   });
 
-  describe('#follow(link)', function () {
+  describe('#follow(link, [callback])', function () {
     var xhr;
     var requests = [];
     var client = new Client();
@@ -114,6 +119,11 @@ describe('Client()', function () {
 
     after(function () {
       xhr.restore();
+    });
+
+    it('should fire the callback', function (done) {
+      client.follow('/4', done);
+      respond(requests.pop());
     });
 
     context('with a link string', function () {
@@ -198,7 +208,7 @@ describe('Client()', function () {
     });
   });
 
-  describe('#submit(action, data)', function () {
+  describe('#submit(action, data, [callback])', function () {
     var xhr;
     var requests = [];
     var client = new Client();
@@ -271,6 +281,12 @@ describe('Client()', function () {
 
       respond(requests.pop(), result);
     });
+
+    it('should fire the callback', function (done) {
+      var action = { href: '/search' };
+      client.submit(action, {}, done);
+      respond(requests.pop());
+    });
   });
 });
 
@@ -283,9 +299,8 @@ describe('Client()', function () {
  * @return {sinon.FakeXMLHttpRequest}
  */
 function respond(request, data, headers) {
-  if (!data) data = {};
-
-  if (!headers) headers = {};
+  if (!data) data = {}; // eslint-disable-line no-param-reassign
+  if (!headers) headers = {}; // eslint-disable-line no-param-reassign
   if (!headers['Content-Type']) headers['Content-Type'] = 'application/vnd.siren+json';
 
   request.respond(200, headers, JSON.stringify(data));

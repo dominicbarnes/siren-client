@@ -40,19 +40,25 @@ Creates a new client instance, if `href` is passed, it will use that as the
 entry point and starts navigating. (make sure to attach to the `entity` and
 `error` events)
 
-### Client#get(url)
+### Client#get(url, [callback])
 
 This is how you set the entry point for the API you are interacting with. It
 will fetch the given URL and use that as the first/new entity.
 
-### Client#follow(link)
+If `callback` is provided, it will be invoked before either `error` or `entity`
+is emitted.
+
+### Client#follow(link, [callback])
 
 This follows the given `link` and uses the response as the next entity.
 
 The `link` param can either be a `String` url, or a link `Object` given by a
 siren API.
 
-### Client#submit(action, data)
+If `callback` is provided, it will be invoked before either `error` or `entity`
+is emitted.
+
+### Client#submit(action, data, [callback])
 
 Submits the `action` with accompanying `data` to the API.
 
@@ -62,6 +68,9 @@ The `data` param is an object of key-value pairs that should be serialized and
 sent as the body. The easiest way to accomplish this is to use a well-formed
 HTML `<form>` along with something like [form-serialize](https://github.com/dominicbarnes/form-serialize)
 to generate the object.
+
+If `callback` is provided, it will be invoked before either `error` or `entity`
+is emitted.
 
 ### Client: `entity(entity)` *(event)*
 
