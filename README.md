@@ -72,19 +72,21 @@ to generate the object.
 If `callback` is provided, it will be invoked before either `error` or `entity`
 is emitted.
 
-### Client: `entity(entity)` *(event)*
+### Client: `entity(entity, href)` *(event)*
 
 Fired after an entity has been loaded. (also after an `action` has been
 processed successfully) The passed `entity` is an instance of `Entity`. (API
 documented below)
 
-### Client: `error(err)` *(event)*
+### Client: `error(err, href)` *(event)*
 
 Fired for errors that happen trying to send/receive data. The raw `err` is
 passed so you can respond accordingly.
 
-**NOTE:** These are **not** application errors. These will likely be HTTP
-failures, rejected cross-origin requests, etc.
+**NOTE:** Generally, these are **not** application errors. These will likely be
+HTTP failures, rejected cross-origin requests, etc. However, a non-siren
+response will also emit this error. (in case your server has not started
+responding with siren for a specific route)
 
 
 ### Entity(data) *(constructor)*
