@@ -2,6 +2,11 @@
 
 > A specialized [siren](https://github.com/kevinswiber/siren) API client.
 
+[![npm version](https://img.shields.io/npm/v/siren-client.svg)](https://www.npmjs.com/package/siren-client)
+[![npm dependencies](https://img.shields.io/david/dominicbarnes/siren-client.svg)](https://david-dm.org/dominicbarnes/siren-client)
+[![npm dev dependencies](https://img.shields.io/david/dev/dominicbarnes/siren-client.svg)](https://david-dm.org/dominicbarnes/siren-client#info=devDependencies)
+[![build status](https://img.shields.io/travis/dominicbarnes/siren-client.svg)](https://travis-ci.org/dominicbarnes/siren-client)
+
 ## Usage
 
 This particular client is built in a very specialized fashion. It operates
