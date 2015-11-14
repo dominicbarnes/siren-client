@@ -6,16 +6,22 @@
   "repository": "dominicbarnes/siren-client",
   "author": "Dominic Barnes <dominic@dbarnes.info>",
   "license": "MIT",
+  "dependencies": {
+    "array-find": "^1.0.0",
+    "clone": "^1.0.2",
+    "superagent": "^1.4.0"
+  },
   "devDependencies": {
     "@dominicbarnes/eslint-config": "*",
     "@dominicbarnes/eslint-config-browser": "*",
     "@dominicbarnes/eslint-config-test": "*",
-    "duo-tester": "^0.1.1",
-    "eslint": "^1.1.0"
+    "eslint": "^1.1.0",
+    "mocha": "^2.3.3",
+    "nock": "^2.17.0"
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "duo-tester phantomjs",
-    "start": "duo-tester browser"
+    "pretest": "npm run lint",
+    "test": "mocha"
   }
 }

@@ -1,5 +1,5 @@
 
-var assert = require('component/assert');
+var assert = require('assert');
 var Entity = require('../lib/entity');
 
 describe('Entity(data)', function () {

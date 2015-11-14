@@ -1,64 +1,39 @@
 
-/* global sinon */
-
-var assert = require('component/assert');
-var load = require('eldargab/load-script');
+var assert = require('assert');
+var nock = require('nock');
 var siren = require('..');
 
+var server = nock('http://localhost/').defaultReplyHeaders({ 'Content-Type': 'application/vnd.siren+json' });
 var Client = siren.Client;
 var Entity = siren.Entity;
 
 describe('Client()', function () {
-  before(function (done) {
-    // loading via external script, because it doesn't play well with duo/component
-    load('//cdnjs.cloudflare.com/ajax/libs/sinon.js/1.15.4/sinon.min.js', done);
-  });
-
   it('should be a constructor function', function () {
     var client = new Client();
     assert(client instanceof Client);
   });
 
-  it('should be an emitter', function () {
-    assert(Client.prototype.on, 'should have an on method');
-  });
-
   describe('#get(href, [callback])', function () {
-    var xhr;
-    var requests = [];
     var client = new Client();
 
-    before(function () {
-      xhr = sinon.useFakeXMLHttpRequest();
-      xhr.onCreate = function (request) {
-        requests.push(request);
-      };
-    });
-
     afterEach(function () {
-      client.off('error').off('entity');
-      assert.equal(requests.length, 0);
-    });
-
-    after(function () {
-      xhr.restore();
+      client.removeAllListeners();
     });
 
     it('should retrieve the specified url', function (done) {
+      server.get('/1').reply(200, {});
+
       client.on('entity', function (entity) {
         assert(entity);
         done();
       });
 
       client.get('/1');
-
-      var request = requests.pop();
-      assert.equal(request.url, '/1');
-      assert.equal(request.method.toLowerCase(), 'get');
-      respond(request);
     });
 
     it('should emit only an error when the content-type for the response is incorrect', function (done) {
+      server.get('/2').reply(200, {}, { 'Content-Type': 'application/json' });
+
       client.on('entity', done);
       client.on('error', function (err) {
         assert(err);
@@ -66,10 +41,11 @@ describe('Client()', function () {
       });
 
       client.get('/2');
-      respond(requests.pop(), {}, { 'Content-Type': 'application/json' });
     });
 
     it('should return an Entity instance', function (done) {
+      server.get('/3').reply(200, {});
+
       client.on('error', done);
       client.on('entity', function (entity) {
         assert(entity instanceof Entity);
@@ -77,11 +53,11 @@ describe('Client()', function () {
       });
 
       client.get('/3');
-      respond(requests.pop());
     });
 
     it('should pass the response body to the Entity constructor', function (done) {
       var data = { title: 'Hello World' };
+      server.get('/4').reply(200, data);
 
       client.on('error', done);
       client.on('entity', function (entity) {
@@ -90,45 +66,30 @@ describe('Client()', function () {
       });
 
       client.get('/4');
-      respond(requests.pop(), data);
     });
 
     it('should fire the callback', function (done) {
-      client.get('/4', done);
-      respond(requests.pop());
+      server.get('/5').reply(200, {});
+      client.get('/5', done);
     });
   });
 
   describe('#follow(link, [callback])', function () {
-    var xhr;
-    var requests = [];
     var client = new Client();
 
-    before(function () {
-      xhr = sinon.useFakeXMLHttpRequest();
-      xhr.onCreate = function (request) {
-        requests.push(request);
-      };
-    });
-
-    // ensure the request queue is empty
     afterEach(function () {
-      client.off('error').off('entity');
-      assert.equal(requests.length, 0);
-    });
-
-    after(function () {
-      xhr.restore();
+      client.removeAllListeners();
     });
 
     it('should fire the callback', function (done) {
-      client.follow('/4', done);
-      respond(requests.pop());
+      server.get('/1').reply(200, {});
+      client.follow('/1', done);
     });
 
     context('with a link string', function () {
       it('should retrieve the specified url', function (done) {
         var data = { title: 'Hello World' };
+        server.get('/2').reply(200, data);
 
         client.on('error', done);
         client.on('entity', function (entity) {
@@ -136,39 +97,38 @@ describe('Client()', function () {
           done();
         });
 
-        client.follow('/5');
-        var request = requests.pop();
-        assert.equal(request.url, '/5');
-        assert.equal(request.method.toLowerCase(), 'get');
-        respond(request, data);
+        client.follow('/2');
       });
 
       it('should emit only an error when the content-type for the response is incorrect', function (done) {
+        server.get('/3').reply(200, {}, { 'Content-Type': 'application/json' });
+
         client.on('entity', done);
         client.on('error', function (err) {
           assert(err);
           done();
         });
 
-        client.follow('/6');
-        respond(requests.pop(), {}, { 'Content-Type': 'application/json' });
+        client.follow('/3');
       });
 
       it('should return an Entity instance', function (done) {
+        server.get('/4').reply(200, {});
+
         client.on('error', done);
         client.on('entity', function (entity) {
           assert(entity instanceof Entity);
           done();
         });
 
-        client.follow('/7');
-        respond(requests.pop());
+        client.follow('/4');
       });
     });
 
     context('with a link object', function () {
       it('should retrieve the specified url', function (done) {
         var data = { title: 'Hello World' };
+        server.get('/5').reply(200, data);
 
         client.on('error', done);
         client.on('entity', function (entity) {
@@ -176,61 +136,45 @@ describe('Client()', function () {
           done();
         });
 
-        client.follow({ href: '/8' });
-
-        var request = requests.pop();
-        assert.equal(request.url, '/8');
-        assert.equal(request.method.toLowerCase(), 'get');
-        respond(request, data);
+        client.follow({ href: '/5' });
       });
 
       it('should emit only an error when the content-type for the response is incorrect', function (done) {
+        server.get('/6').reply(200, {}, { 'Content-Type': 'application/json' });
+
         client.on('entity', done);
         client.on('error', function (err) {
           assert(err);
           done();
         });
 
-        client.follow({ href: '/9' });
-        respond(requests.pop(), {}, { 'Content-Type': 'application/json' });
+        client.follow({ href: '/6' });
       });
 
       it('should return an Entity instance', function (done) {
+        server.get('/7').reply(200, {});
+
         client.on('error', done);
         client.on('entity', function (entity) {
           assert(entity instanceof Entity);
           done();
         });
 
-        client.follow({ href: '/10' });
-        respond(requests.pop());
+        client.follow({ href: '/7' });
       });
     });
   });
 
   describe('#submit(action, data, [callback])', function () {
-    var xhr;
-    var requests = [];
     var client = new Client();
 
-    before(function () {
-      xhr = sinon.useFakeXMLHttpRequest();
-      xhr.onCreate = function (request) {
-        requests.push(request);
-      };
-    });
-
-    // ensure the request queue is empty
     afterEach(function () {
-      client.off('error').off('entity');
-      assert.equal(requests.length, 0);
-    });
-
-    after(function () {
-      xhr.restore();
+      client.removeAllListeners();
     });
 
     it('should get the specified url with query params', function (done) {
+      server.get('/search').query({ terms: 'test' }).reply(200, {});
+
       client.on('error', done);
       client.on('entity', function () {
         done();
@@ -239,15 +183,11 @@ describe('Client()', function () {
       var action = { href: '/search' };
       var data = { terms: 'test' };
       client.submit(action, data);
-
-      var request = requests.pop();
-      assert.equal(request.url, '/search?terms=test');
-      assert.equal(request.method.toLowerCase(), 'get');
-
-      respond(request);
     });
 
     it('should post the specified url with serialized body', function (done) {
+      server.post('/create', 'terms=test').reply(200, {});
+
       client.on('error', done);
       client.on('entity', function () {
         done();
@@ -256,18 +196,11 @@ describe('Client()', function () {
       var action = { href: '/create', method: 'post' };
       var data = { terms: 'test' };
       client.submit(action, data);
-
-      var request = requests.pop();
-      assert.equal(request.url, '/create');
-      assert.equal(request.method.toLowerCase(), 'post');
-      assert.equal(request.requestHeaders['Content-Type'], 'application/x-www-form-urlencoded;charset=utf-8');
-      assert.equal(request.requestBody, 'terms=test');
-
-      respond(request);
     });
 
     it('should make the response the new entity', function (done) {
       var result = { title: 'Hello World' };
+      server.get('/search').query({ terms: 'test' }).reply(200, result);
 
       client.on('error', done);
       client.on('entity', function (entity) {
@@ -278,31 +211,12 @@ describe('Client()', function () {
       var action = { href: '/search' };
       var data = { terms: 'test' };
       client.submit(action, data);
-
-      respond(requests.pop(), result);
     });
 
     it('should fire the callback', function (done) {
       var action = { href: '/search' };
+      server.get('/search').reply(200, {});
       client.submit(action, {}, done);
-      respond(requests.pop());
     });
   });
 });
-
-/**
- * Helper for fake XHR responses
- *
- * @param {FakeXMLHttpRequest} request  The fake xhr object.
- * @param {Object} data                 The JSON data to respond with.
- * @param {Object} headers              HTTP headers to set on the response.
- * @return {sinon.FakeXMLHttpRequest}
- */
-function respond(request, data, headers) {
-  if (!data) data = {}; // eslint-disable-line no-param-reassign
-  if (!headers) headers = {}; // eslint-disable-line no-param-reassign
-  if (!headers['Content-Type']) headers['Content-Type'] = 'application/vnd.siren+json';
-
-  request.respond(200, headers, JSON.stringify(data));
-  return request;
-}
