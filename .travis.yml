@@ -1,0 +1,16 @@
+sudo: false
+language: node_js
+node_js:
+- stable
+install: npm update
+cache:
+  directories:
+  - node_modules
+deploy:
+  provider: npm
+  email: dominic@dbarnes.info
+  api_key:
+    secure: rnJZFVw7ozXWkasO0ebDOvzX/ZpHtpTWFIbmw5l8vAK6b+O5GR8m73DfDheNsQHP+tPL8IwxHTlEgxmFQZgeqxuL4IS1GCiQk73bkWiZM9+po/3AtpryMAlaFaW9VS+L9EwyhUob9MlqexVVi4eK8mj9mhtOwxJwo0iyrO6vxn84zu4y1EZLVfef2yfCBJFTHN9vL3oadAP6xvd/oVx6Cd/PMUiAhHIUgrTOMu0EZJQMf2orv+0g8Ebj9jtWvfyASBz5i9+n+pFqSXnPmDQDeHMvv8kGfbkmuQKbcZbqrY8KilPG4zUHu1l8Vlq6oPgmJstBGngz6Lo5HdojG4DNu28n/5+PTgFgW44I9ld/B9cr1Yihjx+ot3O/TdI1aaOZGlzsDiJ7BqgPm0Gzwp/LYZy9+RT8JRQIS9p0g0B3OM1JmG4aQFe4abMRnd/G2b2a6XEDaQaBAbRb7lJsPQT5r1pU24y89e8ZB8mOSNyYiX0vXXoiWIoOJZ4AJMaZkvNetRh7xtGsd/+tcDCDhL0c+Zn7G1n/9NBrN0mOtZRi6+Bjj1CX1oFONnS3KpA3L4RTkp7qcGAOIUK3DCBb2YB4vMzwERk7k7VZfSrQkcjBsySk9Hd8rNduLG0XqNlN+U+o9YFnI1rfUSc8Lgycofyr87Q/PEuBe/9HwrxBs6XHvvA=
+  on:
+    tags: true
+    repo: dominicbarnes/siren-client
