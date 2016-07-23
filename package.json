@@ -11,10 +11,11 @@
     "superagent": "^1.4.0"
   },
   "devDependencies": {
-    "@dominicbarnes/eslint-config": "*",
-    "@dominicbarnes/eslint-config-browser": "*",
-    "@dominicbarnes/eslint-config-test": "*",
-    "eslint": "^1.1.0",
+    "@dominicbarnes/eslint-config": "^1.0.0",
+    "@dominicbarnes/eslint-config-browser": "^1.0.0",
+    "@dominicbarnes/eslint-config-test": "^1.1.0",
+    "eslint": "^2.13.1",
+    "eslint-plugin-mocha": "^3.0.0",
     "mocha": "^2.3.3",
     "nock": "^3.1.0"
   },
