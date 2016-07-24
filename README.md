@@ -114,6 +114,11 @@ simply return an empty object.
 Retrieves a copy of the `class` array. This always returns an `Array`, even
 if that means it is empty.
 
+### Entity#rel()
+
+Retrieves a copy of the `rel` array. (used for sub-entities) This always
+returns an `Array`, even if that means it is empty.
+
 ### Entity#entity([search])
 
 Retrieves the first entity (wrapped as an `Entity` instance) that matches the
