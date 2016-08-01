@@ -28,7 +28,7 @@ describe('Client()', function () {
         done();
       });
 
-      client.get('/1');
+      client.get('http://localhost/1');
     });
 
     it('should emit only an error when the content-type for the response is incorrect', function (done) {
@@ -40,7 +40,7 @@ describe('Client()', function () {
         done();
       });
 
-      client.get('/2');
+      client.get('http://localhost/2');
     });
 
     it('should return an Entity instance', function (done) {
@@ -52,7 +52,7 @@ describe('Client()', function () {
         done();
       });
 
-      client.get('/3');
+      client.get('http://localhost/3');
     });
 
     it('should pass the response body to the Entity constructor', function (done) {
@@ -65,12 +65,12 @@ describe('Client()', function () {
         done();
       });
 
-      client.get('/4');
+      client.get('http://localhost/4');
     });
 
     it('should fire the callback', function (done) {
       server.get('/5').reply(200, {});
-      client.get('/5', done);
+      client.get('http://localhost/5', done);
     });
   });
 
@@ -83,7 +83,7 @@ describe('Client()', function () {
 
     it('should fire the callback', function (done) {
       server.get('/1').reply(200, {});
-      client.follow('/1', done);
+      client.follow('http://localhost/1', done);
     });
 
     context('with a link string', function () {
@@ -97,7 +97,7 @@ describe('Client()', function () {
           done();
         });
 
-        client.follow('/2');
+        client.follow('http://localhost/2');
       });
 
       it('should emit only an error when the content-type for the response is incorrect', function (done) {
@@ -109,7 +109,7 @@ describe('Client()', function () {
           done();
         });
 
-        client.follow('/3');
+        client.follow('http://localhost/3');
       });
 
       it('should return an Entity instance', function (done) {
@@ -121,7 +121,7 @@ describe('Client()', function () {
           done();
         });
 
-        client.follow('/4');
+        client.follow('http://localhost/4');
       });
     });
 
@@ -136,7 +136,7 @@ describe('Client()', function () {
           done();
         });
 
-        client.follow({ href: '/5' });
+        client.follow({ href: 'http://localhost/5' });
       });
 
       it('should emit only an error when the content-type for the response is incorrect', function (done) {
@@ -148,7 +148,7 @@ describe('Client()', function () {
           done();
         });
 
-        client.follow({ href: '/6' });
+        client.follow({ href: 'http://localhost/6' });
       });
 
       it('should return an Entity instance', function (done) {
@@ -160,7 +160,7 @@ describe('Client()', function () {
           done();
         });
 
-        client.follow({ href: '/7' });
+        client.follow({ href: 'http://localhost/7' });
       });
     });
   });
@@ -180,7 +180,7 @@ describe('Client()', function () {
         done();
       });
 
-      var action = { href: '/search' };
+      var action = { href: 'http://localhost/search' };
       var data = { terms: 'test' };
       client.submit(action, data);
     });
@@ -193,7 +193,7 @@ describe('Client()', function () {
         done();
       });
 
-      var action = { href: '/create', method: 'post' };
+      var action = { href: 'http://localhost/create', method: 'post' };
       var data = { terms: 'test' };
       client.submit(action, data);
     });
@@ -208,13 +208,13 @@ describe('Client()', function () {
         done();
       });
 
-      var action = { href: '/search' };
+      var action = { href: 'http://localhost/search' };
       var data = { terms: 'test' };
       client.submit(action, data);
     });
 
     it('should fire the callback', function (done) {
-      var action = { href: '/search' };
+      var action = { href: 'http://localhost/search' };
       server.get('/search').reply(200, {});
       client.submit(action, {}, done);
     });
