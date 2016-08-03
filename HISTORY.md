@@ -1,4 +1,9 @@
 
+1.4.0 / 2016-08-03
+==================
+
+  * switching to request instead of superagent for better cookie support
+
 1.3.0 / 2016-07-24
 ==================
 
